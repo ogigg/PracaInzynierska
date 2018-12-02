@@ -1,0 +1,22 @@
+<h1>Dane z czujników pomiarowych</h1>
+
+<p *ngIf="!downloadedData"><em>Loading...</em></p>
+
+<table class='table' *ngIf="downloadedData">
+  <thead>
+    <tr>
+      <th>Urządzenie</th>
+      <th>Wiadomość</th>
+      <th>Temp. (C)</th>
+      <th>Wilgotność (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of downloadedData">
+      <td>{{ data.DeviceId }}</td>
+      <td>{{ data.Message }}</td>
+      <td>{{ data.Temperature }}</td>
+      <td>{{ data.Humidity }}</td>
+    </tr>
+  </tbody>
+</table>

@@ -1,0 +1,22 @@
+<h1>Wyślij dane do urządzenia symulowanego</h1>
+
+<div class="form-group">
+  <label for="devicesNames">Wybierz urządzenie:</label>
+<select class="form-control" name="devicesNames" id="devicesNames" [(ngModel)]="currentDevice">
+  <option *ngFor="let device of devices">{{device}}</option>
+</select>
+</div>
+<div class="form-group">
+<label for="message">Wyswietlana Wiadomosc: </label>
+<input type="text" id="message" class="form-control" #messageInput>
+
+<button class="btn btn-primary" (click)="onClick(messageInput.value)">Wyślij!
+</button>
+</div>
+<p><label>Dioda LED</label></p>
+<div class="switch">
+<label class="switch">
+    <input type="checkbox" (click)="onSwitchClick($event)">
+    <span class="slider round"></span>
+  </label>
+</div>
