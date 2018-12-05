@@ -58,7 +58,7 @@ namespace PracaInzynierska.Controllers
             CloudBlobContainer blobContainer = blobClient.GetContainerReference("messages");
             MemoryStream stream = new MemoryStream();
             List<string> blobs = new List<string>();
-            List<Data> data = new List<Data>();
+            List<DeviceInfo> data = new List<DeviceInfo>();
             
             BlobResultSegment resultSegment = blobContainer.ListBlobsSegmentedAsync("PracaInzynierkska/",true,BlobListingDetails.All,null,null,null,null).Result;
             foreach (IListBlobItem item in resultSegment.Results)
@@ -83,7 +83,7 @@ namespace PracaInzynierska.Controllers
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
             CloudBlobContainer blobContainer = blobClient.GetContainerReference("messages");
             CloudBlockBlob blob = blobContainer.GetBlockBlobReference("PracaInzynierkska/00/2018/11/03/20/15");
-            List<Data> data = new List<Data>();
+            List<DeviceInfo> data = new List<DeviceInfo>();
             List<AvroRecord> avroRecords = await GetAvroRecordsAsync(blob);
             foreach (var avroRecord in avroRecords)
             {
@@ -112,11 +112,11 @@ namespace PracaInzynierska.Controllers
 
         }
 
-        private Data GetMyObject(AvroRecord avroRecord)
+        private DeviceInfo GetMyObject(AvroRecord avroRecord)
         {
             var body = avroRecord.GetField<byte[]>("Body");
             var dataBody = Encoding.UTF8.GetString(body);
-            var myObj = JsonConvert.DeserializeObject<Data>(dataBody);
+            var myObj = JsonConvert.DeserializeObject<DeviceInfo>(dataBody);
             return myObj;
         }
 

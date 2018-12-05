@@ -13,11 +13,11 @@ export class IotService {
     })
   };
 
-  sendC2DMessage(message: string){
+  sendC2DMessage(message: string,deviceName){
    var body = ('"message": '+message)
    //var body = JSON.stringify(body)
    console.log(body)
-    return this.http.post("api/iot/SendC2D/?message="+message, this.httpOptions);
+    return this.http.post("api/iot/SendC2D/?message="+message+"&deviceName="+deviceName, this.httpOptions);
   }
   sendC2DBool(message: string){
    var body = ('"status": '+message)
@@ -26,5 +26,8 @@ export class IotService {
   }
   getDevicesNames(){
     return this.http.get("https://localhost:44315/api/iot/GetDevicesNames", this.httpOptions);
+  }
+  getDeviceInfo(){ //Tymczasowe
+    return this.http.get("https://localhost:44315/api/iot/GetDeviceInfo", this.httpOptions);
   }
 }

@@ -1,0 +1,34 @@
+<div *ngIf="deviceInfo">
+  <h1>Nazwa urządzenia: {{deviceInfo.deviceName}}</h1>
+  <h3>Id urządzenia: {{deviceInfo.deviceId}}</h3>
+  <h3>Wiadomość: {{deviceInfo.message}}</h3>
+  <div *ngFor="let port of deviceInfo.portAttributes">
+    <div *ngIf="port.valueType==='bool'">
+      <p><label for={{port.name}}>{{port.label}}</label></p>
+        <div class="switch">
+            <label class="switch">
+                <input name={{port.name}} type="checkbox" id={{port.id}}>
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </div>
+    <div *ngIf="port.valueType==='string'">
+        <p><label for={{port.name}}>{{port.label}}</label></p> 
+        <input id={{port.id}} type="text" id={{port.name}} class="form-control">
+    </div>
+    <div *ngIf="port.valueType==='float'">
+      <p><label for={{port.name}}>{{port.label}}</label></p> 
+        <input type="range" [(ngModel)]="value" step="0.01" min={{port.minValue}} max={{port.maxValue}} id={{port.name}} class="form-control">
+      {{value}} {{port.unit}}
+      </div>
+    <!-- </div> -->
+    <!-- <div *ngIf="port.valueType==='float'">
+        <p><label for={{port.name}}>{{port.label}}</label></p>
+        <mat-slider id={{port.name}} [(ngModel)]="value" min={{port.minValue}} max={{port.maxValue}} step="0.01" ></mat-slider> 
+        {{value}} {{port.unit}}
+    </div> -->
+
+  </div>
+  <button class="btn btn-primary">Wyślij!</button>
+</div>
+

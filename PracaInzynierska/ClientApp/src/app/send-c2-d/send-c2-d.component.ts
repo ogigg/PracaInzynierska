@@ -4,7 +4,8 @@ import { IotService } from '../services/iot.service';
 @Component({
   selector: 'app-send-c2-d',
   templateUrl: './send-c2-d.component.html',
-  styleUrls: ['./send-c2-d.component.css']
+  styleUrls: ['./send-c2-d.component.css'],
+  providers: [ IotService ]
 })
 export class SendC2DComponent implements OnInit {
   message="";
@@ -19,7 +20,7 @@ export class SendC2DComponent implements OnInit {
 
   onClick(message:string){
     console.log(message)
-    this.iotService.sendC2DMessage(message).subscribe(response=>console.log(response))
+    this.iotService.sendC2DMessage(message,this.currentDevice).subscribe(response=>console.log(response))
   }
 
   onSwitchClick(event){

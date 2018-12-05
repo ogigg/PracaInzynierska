@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
 using Newtonsoft.Json;
+using PracaInzynierska.Models;
 
 
 namespace PracaInzynierska.ControllersB
@@ -21,12 +22,32 @@ namespace PracaInzynierska.ControllersB
 
 
         [HttpPost("[action]")]
-        public IActionResult SendC2D(string message)
+        public IActionResult SendC2D(string message, string deviceName)
         {
             s_serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString);
-            InvokeMethod(message).GetAwaiter().GetResult();
-            return Ok("Send!");
+            dynamic C2DMessage = new
+            {
+                Name = "WriteToLCD",
+                Parameters = new
+                {
+                    Text = message
+                }
+            };
+
+            var messageJson = JsonConvert.SerializeObject(C2DMessage);
+
+            var messageArray = Encoding.UTF8.GetBytes(messageJson);
+            var commandMessage = new Message(messageArray);
+            s_serviceClient.SendAsync(deviceName, commandMessage);
+            return Ok(messageJson);
         }
+        //[HttpPost("[action]")]
+        //public IActionResult SendC2D(string message)
+        //{
+        //    s_serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString);
+        //    InvokeMethod(message).GetAwaiter().GetResult();
+        //    return Ok("Send!");
+        //}
 
         [HttpPost("[action]")]
         public IActionResult SendC2DtoNodeMCU(bool LED)
@@ -47,7 +68,7 @@ namespace PracaInzynierska.ControllersB
             var dynArray = Encoding.UTF8.GetBytes(dynJson);
             var commandMessage = new Message(dynArray);
             s_serviceClient.SendAsync("nodeMCU", commandMessage);
-            return Ok("Send!");
+            return Ok(dynJson);
         }
 
         private static async Task InvokeMethod(string message)
@@ -77,18 +98,57 @@ namespace PracaInzynierska.ControllersB
         public async Task<List<string>> GetDevicesNames() //Zwraca listę nazw wszystkich połączonych urządzeń 
         {
             var registryManager = RegistryManager.CreateFromConnectionString(s_connectionString);
-
             var devices = await registryManager.GetDevicesAsync(100);
 
             List<string> devicesNames = new List<string>();
-
             foreach (var device in devices)
             {
                 devicesNames.Add(device.Id); 
             }
-            
-
             return devicesNames;
+        }
+
+
+        [HttpGet("[action]")]
+        public DeviceInfo GetDeviceInfo()
+        {
+
+            DeviceInfo info = new DeviceInfo()
+            {
+                Id = 7,
+                DeviceId = "b555-b34c59e051a9",
+                DeviceName = "Testoweurzadzenie1",
+                Message = "To jest test dynamicznego generowania interfejsu",
+            };
+            info.PortAttributes.Add(new PortAttributes()
+            {
+                Id = 1,
+                Name = "WriteToLCD",
+                Label = "Wiadomosc na ekranie LCD:",
+                GPIOType = "input",
+                ValueType = "string",
+                MinValue = 0,
+                MaxValue = 16
+            });
+            info.PortAttributes.Add(new PortAttributes()
+            {
+                Id = 2,
+                Name = "LED1",
+                Label = "Sterowanie Dioda 1: ",
+                GPIOType = "input",
+                ValueType = "bool"
+            });            info.PortAttributes.Add(new PortAttributes()
+            {
+                Id = 3,
+                Name = "MoveServo",
+                Label = "Wychylenie serwa (%): ",
+                GPIOType = "input",
+                ValueType = "float",
+                Unit = "%",
+                MaxValue = 100,
+                MinValue = 0
+            });
+            return info;
         }
 
     }
