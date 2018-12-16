@@ -16,6 +16,7 @@ import { IotService } from './services/iot.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import 'hammerjs';
 import {MatSliderModule} from '@angular/material/slider';
+import { SignalRtestComponent } from './signal-rtest/signal-rtest.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import {MatSliderModule} from '@angular/material/slider';
     CounterComponent,
     FetchDataComponent,
     SendC2DComponent,
-    DynamicInterfaceComponent
+    DynamicInterfaceComponent,
+    SignalRtestComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -40,9 +42,10 @@ import {MatSliderModule} from '@angular/material/slider';
       { path: 'fetch-data', component: FetchDataComponent },
       { path: 'SendC2D', component: SendC2DComponent },
       { path: 'DyamicInterface', component: DynamicInterfaceComponent },
+      { path: 'signalr', component: SignalRtestComponent },
     ])
   ],
-  //providers: [IotService],
+  providers: [IotService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

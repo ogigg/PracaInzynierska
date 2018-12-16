@@ -18,8 +18,8 @@
     </div>
     <div *ngIf="port.valueType==='float'">
       <p><label for={{port.name}}>{{port.label}}</label></p> 
-        <input type="range" [(ngModel)]="value" step="0.01" min={{port.minValue}} max={{port.maxValue}} id={{port.name}} class="form-control">
-      {{value}} {{port.unit}}
+        <input type="range" [(ngModel)]="port.value" step="0.01" min={{port.minValue}} max={{port.maxValue}} id={{port.name}} class="form-control">
+      {{port.value}} {{port.unit}}
       </div>
     <!-- </div> -->
     <!-- <div *ngIf="port.valueType==='float'">

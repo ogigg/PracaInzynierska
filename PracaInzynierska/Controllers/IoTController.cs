@@ -8,7 +8,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Devices;
 using Newtonsoft.Json;
+using PracaInzynierska.Hubs;
 using PracaInzynierska.Models;
+using Microsoft.AspNetCore.SignalR;
+using PracaInzynierska.Controllers;
+using PracaInzynierska.Others;
 
 
 namespace PracaInzynierska.ControllersB
@@ -18,8 +22,28 @@ namespace PracaInzynierska.ControllersB
     public class IoTController : ControllerBase
     {
         private static ServiceClient s_serviceClient;
-        private readonly static string s_connectionString = "HostName=PracaInzynierkska.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=ib4HWDWL7wqBkzkGlDxhhfQ5n7ujqe3AVrWAYMQdPzA=";
+        
+        private readonly static string s_connectionString =
+            "HostName=PracaInzynierkska.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=ib4HWDWL7wqBkzkGlDxhhfQ5n7ujqe3AVrWAYMQdPzA=";
 
+        private static IHubContext<IoTSignalRHub> _hubContext;
+
+        private readonly ISignalR _signalRController;
+
+        public IoTController(IHubContext<IoTSignalRHub> hubContext, ISignalR signalRController)
+        {
+            _hubContext = hubContext;
+            _signalRController = signalRController;
+        }
+
+
+        [HttpGet("SignalR")]
+        public IActionResult SignalRActionResult(string name, string message)
+        {
+            _signalRController.SendMessage(name, message);
+            return Ok("send!");
+        }
+       
 
         [HttpPost("[action]")]
         public IActionResult SendC2D(string message, string deviceName)
@@ -41,20 +65,13 @@ namespace PracaInzynierska.ControllersB
             s_serviceClient.SendAsync(deviceName, commandMessage);
             return Ok(messageJson);
         }
-        //[HttpPost("[action]")]
-        //public IActionResult SendC2D(string message)
-        //{
-        //    s_serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString);
-        //    InvokeMethod(message).GetAwaiter().GetResult();
-        //    return Ok("Send!");
-        //}
 
         [HttpPost("[action]")]
         public IActionResult SendC2DtoNodeMCU(bool LED)
         {
             s_serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString);
-            
-            
+
+
             dynamic TurnLED = new
             {
                 Name = "TurnLED",
@@ -73,11 +90,11 @@ namespace PracaInzynierska.ControllersB
 
         private static async Task InvokeMethod(string message)
         {
-            var methodInvocation = new CloudToDeviceMethod("SendMessage") { ResponseTimeout = TimeSpan.FromSeconds(30) };
-            
-            message = JsonConvert.SerializeObject(new { message = message });
+            var methodInvocation = new CloudToDeviceMethod("SendMessage") {ResponseTimeout = TimeSpan.FromSeconds(30)};
+
+            message = JsonConvert.SerializeObject(new {message = message});
             methodInvocation.SetPayloadJson(message);
-            
+
             // Invoke the direct method asynchronously and get the response from the simulated device.
             var response = await s_serviceClient.InvokeDeviceMethodAsync("SymulowaneUrzadzenie", methodInvocation);
 
@@ -93,7 +110,6 @@ namespace PracaInzynierska.ControllersB
             //Console.WriteLine(response.GetPayloadAsJson());
         }
 
-
         [HttpGet("[action]")]
         public async Task<List<string>> GetDevicesNames() //Zwraca listę nazw wszystkich połączonych urządzeń 
         {
@@ -103,24 +119,24 @@ namespace PracaInzynierska.ControllersB
             List<string> devicesNames = new List<string>();
             foreach (var device in devices)
             {
-                devicesNames.Add(device.Id); 
+                devicesNames.Add(device.Id);
             }
+
             return devicesNames;
         }
-
 
         [HttpGet("[action]")]
         public DeviceInfo GetDeviceInfo()
         {
 
-            DeviceInfo info = new DeviceInfo()
+            DeviceInfo deviceInfo = new DeviceInfo()
             {
                 Id = 7,
                 DeviceId = "b555-b34c59e051a9",
                 DeviceName = "Testoweurzadzenie1",
                 Message = "To jest test dynamicznego generowania interfejsu",
             };
-            info.PortAttributes.Add(new PortAttributes()
+            deviceInfo.PortAttributes.Add(new PortAttributes()
             {
                 Id = 1,
                 Name = "WriteToLCD",
@@ -130,14 +146,15 @@ namespace PracaInzynierska.ControllersB
                 MinValue = 0,
                 MaxValue = 16
             });
-            info.PortAttributes.Add(new PortAttributes()
+            deviceInfo.PortAttributes.Add(new PortAttributes()
             {
                 Id = 2,
                 Name = "LED1",
                 Label = "Sterowanie Dioda 1: ",
                 GPIOType = "input",
                 ValueType = "bool"
-            });            info.PortAttributes.Add(new PortAttributes()
+            });
+            deviceInfo.PortAttributes.Add(new PortAttributes()
             {
                 Id = 3,
                 Name = "MoveServo",
@@ -148,8 +165,9 @@ namespace PracaInzynierska.ControllersB
                 MaxValue = 100,
                 MinValue = 0
             });
-            return info;
+            return deviceInfo;
         }
+
 
     }
 }

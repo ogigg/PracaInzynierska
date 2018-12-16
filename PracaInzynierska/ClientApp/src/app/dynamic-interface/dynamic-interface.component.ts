@@ -9,7 +9,6 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DynamicInterfaceComponent implements OnInit {
   deviceInfo;
-
   constructor(private iotService: IotService) {
     iotService.getDeviceInfo().subscribe(response=>{
       this.deviceInfo=response;

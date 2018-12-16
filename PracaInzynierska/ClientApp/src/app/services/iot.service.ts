@@ -25,9 +25,9 @@ export class IotService {
     return this.http.post("api/iot/SendC2DtoNodeMCU/?LED="+message, this.httpOptions);
   }
   getDevicesNames(){
-    return this.http.get("https://localhost:44315/api/iot/GetDevicesNames", this.httpOptions);
+    return this.http.get("/api/iot/GetDevicesNames", this.httpOptions);
   }
   getDeviceInfo(){ //Tymczasowe
-    return this.http.get("https://localhost:44315/api/iot/GetDeviceInfo", this.httpOptions);
+    return this.http.get("/api/iot/GetDeviceInfo", this.httpOptions);
   }
 }
