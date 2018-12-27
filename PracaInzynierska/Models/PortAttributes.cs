@@ -15,6 +15,6 @@ namespace PracaInzynierska.Models
         public float MaxValue { get; set; }
         public float MinValue { get; set; }
         public string GPIOType { get; set; }
-        //public Value Value{ get; set; }
+        public Value Value{ get; set; }
     }
 }

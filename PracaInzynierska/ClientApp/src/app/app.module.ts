@@ -17,6 +17,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import 'hammerjs';
 import {MatSliderModule} from '@angular/material/slider';
 import { SignalRtestComponent } from './signal-rtest/signal-rtest.component';
+import { DevicesManagerComponent } from './devices-manager/devices-manager.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { SignalRtestComponent } from './signal-rtest/signal-rtest.component';
     FetchDataComponent,
     SendC2DComponent,
     DynamicInterfaceComponent,
-    SignalRtestComponent
+    SignalRtestComponent,
+    DevicesManagerComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
@@ -43,6 +45,7 @@ import { SignalRtestComponent } from './signal-rtest/signal-rtest.component';
       { path: 'SendC2D', component: SendC2DComponent },
       { path: 'DyamicInterface', component: DynamicInterfaceComponent },
       { path: 'signalr', component: SignalRtestComponent },
+      { path: 'devicesManager', component: DevicesManagerComponent },
     ])
   ],
   providers: [IotService],

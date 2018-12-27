@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using PracaInzynierska.Hubs;
 using PracaInzynierska.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Azure.Devices.Client.Exceptions;
 using PracaInzynierska.Controllers;
 using PracaInzynierska.Others;
 
@@ -22,12 +23,11 @@ namespace PracaInzynierska.ControllersB
     public class IoTController : ControllerBase
     {
         private static ServiceClient s_serviceClient;
-        
         private readonly static string s_connectionString =
             "HostName=PracaInzynierkska.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=ib4HWDWL7wqBkzkGlDxhhfQ5n7ujqe3AVrWAYMQdPzA=";
 
         private static IHubContext<IoTSignalRHub> _hubContext;
-
+        private static RegistryManager _registryManager = RegistryManager.CreateFromConnectionString(s_connectionString);
         private readonly ISignalR _signalRController;
 
         public IoTController(IHubContext<IoTSignalRHub> hubContext, ISignalR signalRController)
@@ -43,7 +43,48 @@ namespace PracaInzynierska.ControllersB
             _signalRController.SendMessage(name, message);
             return Ok("send!");
         }
-       
+
+        [HttpGet("[action]")]
+        public async Task<ConnectionString> GetDeviceConnectionString (string deviceId)
+        {
+            Device device = await _registryManager.GetDeviceAsync(deviceId);//wyszukaj urządzenie na liście
+
+            if (device != null)//jeśli urządzenie jest na liście
+            {
+                return new ConnectionString() //zwróć dane
+                {
+                    primaryKey = device.Authentication.SymmetricKey.PrimaryKey,
+                    secondaryKey = device.Authentication.SymmetricKey.SecondaryKey
+                };
+            }
+            return null; //zwróć pustą wartość jeśli urządzenia nie ma na liście
+        }
+
+        [HttpGet("[action]")]
+        public async Task<Device> GetAllDeviceData (string deviceId)
+        {
+            Device device;
+            device = await _registryManager.GetDeviceAsync(deviceId);//wyszukaj urządzenie na liście
+            return device; //zwróć wszystkie dane urządzenia
+        }
+
+        [HttpGet("[action]")]
+        public async Task<Device> CreateNewDevice (string deviceId)
+        {
+            Device device;
+            device = await _registryManager.GetDeviceAsync(deviceId);//wyszukaj urządzenie na liście
+
+            if (device == null)//jeśli nie ma urządzenia na liście
+            {
+                device = await _registryManager.AddDeviceAsync(new Device(deviceId)); //utwórz nowe urządzenie
+                return device;//zwróć dane urządznia
+            }
+
+            return null; //nie zwracaj nic jeśli urządzenie istnieje
+
+
+
+        }
 
         [HttpPost("[action]")]
         public IActionResult SendC2D(string message, string deviceName)
@@ -113,8 +154,7 @@ namespace PracaInzynierska.ControllersB
         [HttpGet("[action]")]
         public async Task<List<string>> GetDevicesNames() //Zwraca listę nazw wszystkich połączonych urządzeń 
         {
-            var registryManager = RegistryManager.CreateFromConnectionString(s_connectionString);
-            var devices = await registryManager.GetDevicesAsync(100);
+            var devices = await _registryManager.GetDevicesAsync(100);
 
             List<string> devicesNames = new List<string>();
             foreach (var device in devices)
@@ -131,7 +171,6 @@ namespace PracaInzynierska.ControllersB
 
             DeviceInfo deviceInfo = new DeviceInfo()
             {
-                Id = 7,
                 DeviceId = "b555-b34c59e051a9",
                 DeviceName = "Testoweurzadzenie1",
                 Message = "To jest test dynamicznego generowania interfejsu",

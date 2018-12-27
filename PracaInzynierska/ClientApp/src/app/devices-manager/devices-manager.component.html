@@ -1,0 +1,26 @@
+<h3>Pobierz klucz do urządzenia</h3>
+<div class="form-group" *ngIf="!AddDeviceLayout">
+  <label for="devicesNames">Wybierz urządzenie:</label>
+  <select class="form-control" name="devicesNames" id="devicesNames" [(ngModel)]="currentDevice" (change)="onSelectChange()">
+  <option value="0">Wybierz urządzenie z listy</option>
+  <option *ngFor="let device of devices">{{device}}</option>
+</select>
+
+<div *ngIf="currentDevice && !AddDeviceLayout && currentDevice!=0" >
+  <label for="primaryKey">Primary key:</label>
+  <input type="text" id="primaryKey" class="form-control" [value]=primaryKey readonly>
+  <label for="secondarykey">Secondary key:</label>
+  <input type="text" id="secondaryKey" class="form-control" [value]=secondaryKey readonly>
+  <label for="secondarykey">Connection String:</label>
+  <input type="text" id="secondaryKey" class="form-control" [value]=connectionString readonly>
+</div>
+<button class="btn btn-primary" (click)="onAddDeviceLayout()" >Dodaj nowe urządzenie</button>
+</div>
+
+<div *ngIf="AddDeviceLayout">
+  <label for="deviceId">Nazwa urządzenia:</label>
+  <input type="text" id="deviceId" class="form-control" #deviceId>
+  <button class="btn btn-primary" (click)="onAddDevice()" >Utwórz!</button>
+
+
+</div>

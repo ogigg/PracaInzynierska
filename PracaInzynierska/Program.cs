@@ -10,7 +10,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Azure.EventHubs;
 using Microsoft.Azure.EventHubs.Processor;
 using System.Threading.Tasks;
-
+using Microsoft.ServiceBus.Messaging;
+using PracaInzynierska.Others;
 
 namespace PracaInzynierska
 {
@@ -23,11 +24,11 @@ namespace PracaInzynierska
         private const string StorageAccountKey = "7aAk2oKO9j0/DXAE3Tn1Cbddm1B7oMWIavP0ots0iqxpWEdDpZ+aeDCxUduhODxjDIGb2yiFgJDjCqPPHdCSpQ==";
 
         private static readonly string StorageConnectionString = string.Format("DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}", StorageAccountName, StorageAccountKey);
+        private readonly ISignalR _signalRController;
 
         private static async Task MainAsync(string[] args)
         {
             Console.WriteLine("Registering EventProcessor...");
-
             var eventProcessorHost = new EventProcessorHost(
                 EventHubName,
                 PartitionReceiver.DefaultConsumerGroupName,
@@ -47,11 +48,14 @@ namespace PracaInzynierska
 
         public static void Main(string[] args)
         {
+            MainAsync(args);
             CreateWebHostBuilder(args).Build().Run();
+
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
+        
     }
 }

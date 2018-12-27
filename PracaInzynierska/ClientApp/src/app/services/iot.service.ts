@@ -30,4 +30,10 @@ export class IotService {
   getDeviceInfo(){ //Tymczasowe
     return this.http.get("/api/iot/GetDeviceInfo", this.httpOptions);
   }
+  getDeviceConnectionString(deviceId: string){ //Tymczasowe
+    return this.http.get("/api/iot/GetDeviceConnectionString?deviceId="+deviceId, this.httpOptions);
+  }
+  CreateNewDevice(deviceId: string){ //Tymczasowe
+    return this.http.get("/api/iot/CreateNewDevice?deviceId="+deviceId, this.httpOptions);
+  }
 }

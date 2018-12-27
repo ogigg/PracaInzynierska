@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Devices;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json;
@@ -14,6 +15,7 @@ using Newtonsoft.Json.Linq;
 using PracaInzynierska.Models;
 using Microsoft.Hadoop.Avro;
 using Microsoft.Hadoop.Avro.Container;
+using PracaInzynierska.ControllersB;
 
 
 namespace PracaInzynierska.Controllers
@@ -50,6 +52,79 @@ namespace PracaInzynierska.Controllers
             //return Ok(blobString);
         }
 
+        [HttpGet("[action]")]
+        public async Task<List<DeviceInfo>> IotConfig()
+        {
+            List<DeviceInfo> blobDeviceInfo = await GetAllBlobsAsDeviceInfo();
+            List<DeviceInfo> DeviceConfigInfo = new List<DeviceInfo>();
+            List<DeviceInfo> FinalDeviceList = new List<DeviceInfo>();
+            foreach (DeviceInfo device in blobDeviceInfo)
+            {
+                if (device.MessageType == "configuration")
+                {
+                    if (device.Time != null)
+                    {
+                        DeviceConfigInfo.Add(device);
+                    }
+                    
+                }
+                
+            }
+            string s_connectionString =
+            "HostName=PracaInzynierkska.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=ib4HWDWL7wqBkzkGlDxhhfQ5n7ujqe3AVrWAYMQdPzA=";
+
+            RegistryManager _registryManager = RegistryManager.CreateFromConnectionString(s_connectionString);
+            var devices = await _registryManager.GetDevicesAsync(100);
+
+            List<string> devicesNames = new List<string>();
+            foreach (var device in devices)
+            {
+                devicesNames.Add(device.Id);
+            }
+
+            foreach (string name in devicesNames)
+            {
+                var tempDeviceInfoList = new List<DeviceInfo>();
+                foreach (DeviceInfo device in DeviceConfigInfo)
+                {
+                    if (device.DeviceId == name) 
+                        tempDeviceInfoList.Add(device);
+                }
+                if (tempDeviceInfoList.Count > 0) {
+                    DeviceInfo item = tempDeviceInfoList[tempDeviceInfoList.Count - 1];
+                    FinalDeviceList.Add(item);
+                }
+                    
+            }
+            //IoTController iotcontroler = new IoTController();
+            //List<string> names = await iotcontroler.GetDevicesNames();
+            return FinalDeviceList;
+        }
+
+        private async Task<List<DeviceInfo>> GetAllBlobsAsDeviceInfo()
+        {
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(StorageConnectionString);
+            CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
+            CloudBlobContainer blobContainer = blobClient.GetContainerReference("messages");
+            MemoryStream stream = new MemoryStream();
+            List<string> blobs = new List<string>();
+            List<DeviceInfo> data = new List<DeviceInfo>();
+
+            BlobResultSegment resultSegment = blobContainer.ListBlobsSegmentedAsync("PracaInzynierkska/", true, BlobListingDetails.All, null, null, null, null).Result;
+            foreach (IListBlobItem item in resultSegment.Results)
+            {
+                if (item.GetType() == typeof(CloudBlockBlob))
+                {
+                    List<AvroRecord> avroRecords = await GetAvroRecordsAsync((CloudBlockBlob)item);
+                    foreach (var avroRecord in avroRecords)
+                    {
+                        data.Add(GetMyObject(avroRecord));
+                    }
+                }
+            }
+            //var dataJson = JsonConvert.SerializeObject(data);
+            return data;
+        }
         private async Task<string> GetAllBlobsAsString()
         {
             //Dzia³a, zwraca wszystko

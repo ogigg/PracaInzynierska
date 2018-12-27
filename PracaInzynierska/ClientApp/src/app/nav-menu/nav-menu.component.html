@@ -32,6 +32,11 @@
                         <span class='glyphicon glyphicon-th-list'></span> Dynamiczne generowanie interfejsu
                     </a>
                 </li>
+                <li [routerLinkActive]='["link-active"]'>
+                    <a [routerLink]='["/devicesManager"]' (click)='collapse()'>
+                        <span class='glyphicon glyphicon-th-list'></span> Zarządzaj urządzeniami
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
