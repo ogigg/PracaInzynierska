@@ -28,7 +28,7 @@ export class IotService {
     return this.http.get("/api/iot/GetDevicesNames", this.httpOptions);
   }
   getDeviceInfo(){ //Tymczasowe
-    return this.http.get("/api/iot/GetDeviceInfo", this.httpOptions);
+    return this.http.get("/api/device/IotConfig", this.httpOptions);
   }
   getDeviceConnectionString(deviceId: string){ //Tymczasowe
     return this.http.get("/api/iot/GetDeviceConnectionString?deviceId="+deviceId, this.httpOptions);

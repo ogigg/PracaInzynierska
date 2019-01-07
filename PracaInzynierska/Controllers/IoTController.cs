@@ -87,7 +87,7 @@ namespace PracaInzynierska.ControllersB
         }
 
         [HttpPost("[action]")]
-        public IActionResult SendC2D(string message, string deviceName)
+        public IActionResult SendC2DOld(string message, string deviceName)
         {
             s_serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString);
             dynamic C2DMessage = new
@@ -101,6 +101,27 @@ namespace PracaInzynierska.ControllersB
 
             var messageJson = JsonConvert.SerializeObject(C2DMessage);
 
+            var messageArray = Encoding.UTF8.GetBytes(messageJson);
+            var commandMessage = new Message(messageArray);
+            s_serviceClient.SendAsync(deviceName, commandMessage);
+            return Ok(messageJson);
+        }
+
+        [HttpPost("[action]")]
+        public IActionResult SendC2DCommand(string deviceName, string functionName, string parameterName, string parameterValue)
+        {
+            s_serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString);
+            dynamic C2DMessage = new
+            {
+                Name = functionName,
+                Parameters = new
+                {
+                    Text = parameterValue
+                }
+            };
+
+
+            var messageJson = JsonConvert.SerializeObject(C2DMessage);
             var messageArray = Encoding.UTF8.GetBytes(messageJson);
             var commandMessage = new Message(messageArray);
             s_serviceClient.SendAsync(deviceName, commandMessage);
@@ -166,16 +187,16 @@ namespace PracaInzynierska.ControllersB
         }
 
         [HttpGet("[action]")]
-        public DeviceInfo GetDeviceInfo()
+        public DeviceConfig GetDeviceInfo()
         {
 
-            DeviceInfo deviceInfo = new DeviceInfo()
+            DeviceConfig deviceConfig = new DeviceConfig()
             {
                 DeviceId = "b555-b34c59e051a9",
                 DeviceName = "Testoweurzadzenie1",
                 Message = "To jest test dynamicznego generowania interfejsu",
             };
-            deviceInfo.PortAttributes.Add(new PortAttributes()
+            deviceConfig.PortAttributes.Add(new PortAttributes()
             {
                 Id = 1,
                 Name = "WriteToLCD",
@@ -185,7 +206,7 @@ namespace PracaInzynierska.ControllersB
                 MinValue = 0,
                 MaxValue = 16
             });
-            deviceInfo.PortAttributes.Add(new PortAttributes()
+            deviceConfig.PortAttributes.Add(new PortAttributes()
             {
                 Id = 2,
                 Name = "LED1",
@@ -193,7 +214,7 @@ namespace PracaInzynierska.ControllersB
                 GPIOType = "input",
                 ValueType = "bool"
             });
-            deviceInfo.PortAttributes.Add(new PortAttributes()
+            deviceConfig.PortAttributes.Add(new PortAttributes()
             {
                 Id = 3,
                 Name = "MoveServo",
@@ -204,7 +225,7 @@ namespace PracaInzynierska.ControllersB
                 MaxValue = 100,
                 MinValue = 0
             });
-            return deviceInfo;
+            return deviceConfig;
         }
 
 

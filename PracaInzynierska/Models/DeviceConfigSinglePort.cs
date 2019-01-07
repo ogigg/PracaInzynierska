@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace PracaInzynierska.Models
 {
-    public class DeviceInfo
+    public class DeviceConfigSinglePort
     {
         public string DeviceId { get; set; }
 
-        public string MessageType { get; set; }
+        public string MessageType { get; set; } //configuration
 
         public string DeviceName { get; set; }
 
@@ -18,11 +18,7 @@ namespace PracaInzynierska.Models
 
         public DateTime Time { get; set; }
 
-        public ICollection<PortAttributes> PortAttributes { get; set; }
+        public PortAttributes PortAttributes { get; set; }
 
-        public DeviceInfo()
-        {
-            PortAttributes = new Collection<PortAttributes>();
-        }
     }
 }

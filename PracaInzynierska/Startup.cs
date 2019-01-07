@@ -24,6 +24,7 @@ namespace PracaInzynierska
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddScoped<ISignalR, SignalRController>();
             services.AddSignalR();
@@ -32,8 +33,10 @@ namespace PracaInzynierska
                 builder
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .WithOrigins("http://localhost:4200");
+                    .WithOrigins("http://localhost:5000"); //bylo 4200
             }));
+            services.AddHostedService<ConsumeScopedServiceHostedService>();
+            services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -53,7 +56,8 @@ namespace PracaInzynierska
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
-            
+
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseSpaStaticFiles();

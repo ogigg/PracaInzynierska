@@ -8,16 +8,34 @@ import { Component, OnInit } from '@angular/core';
   providers: [ IotService ]
 })
 export class DynamicInterfaceComponent implements OnInit {
+  deviceInfoArray;
   deviceInfo;
+  devicesNames;
+  currentDevice;
   constructor(private iotService: IotService) {
     iotService.getDeviceInfo().subscribe(response=>{
-      this.deviceInfo=response;
-      console.log(this.deviceInfo);
-    })
+      this.deviceInfoArray=response;
+      console.log(this.deviceInfoArray);
+    });
+    iotService.getDevicesNames().subscribe(response=>{
+      this.devicesNames=response;
+      console.log(this.devicesNames);
+    });
     
    }
 
   ngOnInit() {
+  }
+  onSelectDeviceChange(){
+    for(var i = 0; i < this.deviceInfoArray.length; i++)
+    {
+      if(this.deviceInfoArray[i].deviceId === this.currentDevice)
+      {
+        this.deviceInfo = this.deviceInfoArray[i];
+      }
+    }
+    console.log(this.currentDevice);
+    console.log(this.deviceInfo);
   }
 
 }
