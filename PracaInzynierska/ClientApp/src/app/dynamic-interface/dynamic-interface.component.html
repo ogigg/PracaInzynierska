@@ -5,46 +5,50 @@
   <option *ngFor="let device of devicesNames">{{device}}</option>
 </select>
 </div>
-
+<div *ngIf="deviceInfoArray == null">
+  Czekam na pobranie danych konfiguracyjnych...
+</div>
 <div *ngIf="deviceInfo">
+
   <h1>Nazwa urządzenia: {{deviceInfo.deviceName}}</h1>
   <h3>Id urządzenia: {{deviceInfo.deviceId}}</h3>
   <h3>Wiadomość: {{deviceInfo.message}}</h3>
   <h3>Konfiguracja z godziny: {{deviceInfo.time | date: 'medium'}}</h3>
+  <h3 *ngIf="deviceData">Dane z godziny: {{deviceData.time | date: 'medium'}}</h3>
   <br>
   <div *ngFor="let port of deviceInfo.portAttributes">
     <div *ngIf="port.valueType==='bool'">
-      <p><label for={{port.name}}>{{port.label}}</label></p>
+      <p><label for={{port.id}}>{{port.label}}</label></p>
         <div class="switch">
             <label class="switch">
-                <input name={{port.name}} type="checkbox" id={{port.id}}>
+                <input name={{port.name}} type="checkbox" [checked]="port.value" [(ngModel)]="port.value" id={{port.id}} [disabled]="port.gpioType === 'output'? 'true' : 'false'">
                 <span class="slider round"></span>
             </label>
         </div>
     </div>
     <div *ngIf="port.valueType==='string'">
-        <p><label for={{port.name}}>{{port.label}}</label></p> 
-        <input id={{port.id}} type="text" id={{port.name}} class="form-control">
+        <p><label for={{port.id}}>{{port.label}}</label></p> 
+        <input name={{port.name}} type="text" id={{port.id}} class="form-control">
     </div>
     <div *ngIf="port.valueType==='float'">
-      <p><label for={{port.name}}>{{port.label}}</label></p> 
-        <input type="range" [(ngModel)]="port.value" step="0.01" min={{port.minValue}} max={{port.maxValue}} id={{port.name}} class="form-control">
+      <p><label for={{port.id}}>{{port.label}}</label></p> 
+        <input type="range" [(ngModel)]="port.value" name={{port.name}} step="0.01" min={{port.minValue}} max={{port.maxValue}} id={{port.id}} class="form-control" [disabled]="port.gpioType === 'output'? 'true' : 'false'">
+      {{port.value}} {{port.unit}}
+      </div>
+    <div *ngIf="port.valueType==='double'">
+      <p><label for={{port.id}}>{{port.label}}</label></p> 
+        <input type="range" [(ngModel)]="port.value" name={{port.name}} step="0.01" min={{port.minValue}} max={{port.maxValue}} id={{port.id}} class="form-control" [disabled]="port.gpioType === 'output'? 'true' : 'false'">
       {{port.value}} {{port.unit}}
       </div>
     <div *ngIf="port.valueType==='int'">
-      <p><label for={{port.name}}>{{port.label}}</label></p> 
-        <input type="range" [(ngModel)]="port.value" step="1" min={{port.minValue}} max={{port.maxValue}} id={{port.name}} class="form-control">
+      <p><label for={{port.id}}>{{port.label}}</label></p> 
+        <input type="range" [(ngModel)]="port.value" name={{port.name}} step="1" min={{port.minValue}} max={{port.maxValue}} id={{port.id}} class="form-control" [disabled]="port.gpioType === 'output'? 'true' : 'false'">
       {{port.value}} {{port.unit}}
       </div>
-    <!-- </div> -->
-    <!-- <div *ngIf="port.valueType==='float'">
-        <p><label for={{port.name}}>{{port.label}}</label></p>
-        <mat-slider id={{port.name}} [(ngModel)]="value" min={{port.minValue}} max={{port.maxValue}} step="0.01" ></mat-slider> 
-        {{value}} {{port.unit}}
-    </div> -->
+
 
   </div>
-  <button class="btn btn-primary">Wyślij do urządzenia!</button>
-  <button class="btn btn-primary">Pobierz ostatnie dane!</button>
+  <button class="btn btn-primary" (click)="onSend()">Wyślij do urządzenia!</button>
+  <button class="btn btn-primary" (click)="onGetMessages()">Pobierz ostatnie dane!</button>
 </div>
 

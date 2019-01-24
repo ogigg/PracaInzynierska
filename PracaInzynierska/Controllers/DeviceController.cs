@@ -247,12 +247,18 @@ namespace PracaInzynierska.Controllers
             {
                 if (item.GetType() == typeof(CloudBlockBlob))
                 {
-                    List<AvroRecord> avroRecords = await GetAvroRecordsAsync((CloudBlockBlob)item);
-                    foreach (var avroRecord in avroRecords)
-                    {
-                        blobs.Add(GetBodyAsStringFromAvro(avroRecord));
-                        //data.Add(ConvertAvroToDeviceConfig(avroRecord));
+                    try {
+                        List<AvroRecord> avroRecords = await GetAvroRecordsAsync((CloudBlockBlob)item);
+                        foreach (var avroRecord in avroRecords)
+                        {
+                            blobs.Add(GetBodyAsStringFromAvro(avroRecord));
+                            //data.Add(ConvertAvroToDeviceConfig(avroRecord));
+                        }
                     }
+                    catch
+                    {
+                    }
+
                 }
             }
             string blobsAsString=  String.Join(", ", blobs.ToArray());

@@ -12,6 +12,7 @@ using PracaInzynierska.Hubs;
 using PracaInzynierska.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.Devices.Client.Exceptions;
+using Newtonsoft.Json.Linq;
 using PracaInzynierska.Controllers;
 using PracaInzynierska.Others;
 
@@ -42,6 +43,11 @@ namespace PracaInzynierska.ControllersB
         {
             _signalRController.SendMessage(name, message);
             return Ok("send!");
+        }
+        [HttpPost("SignalR1")]
+        public void SignalRPostJSON([FromBody]string message)
+        {
+            _signalRController.SendMessage("EventHub", message);
         }
 
         [HttpGet("[action]")]
@@ -111,15 +117,32 @@ namespace PracaInzynierska.ControllersB
         public IActionResult SendC2DCommand(string deviceName, string functionName, string parameterName, string parameterValue)
         {
             s_serviceClient = ServiceClient.CreateFromConnectionString(s_connectionString);
-            dynamic C2DMessage = new
+            JObject C2DMessage;
+            if (parameterValue == "true" || parameterValue == "false")
             {
-                Name = functionName,
-                Parameters = new
+                bool parameterBool = false; ;
+                if (parameterValue == "true") parameterBool = true;
+                if (parameterValue == "false") parameterBool = false;
+                C2DMessage = new JObject()
                 {
-                    Text = parameterValue
-                }
-            };
-
+                    ["Name"] = functionName,
+                    ["Parameters"] = new JObject()
+                    {
+                        [parameterName] = JToken.FromObject(parameterBool)
+                    }
+                };
+            }
+            else
+            {
+                C2DMessage = new JObject()
+                {
+                    ["Name"] = functionName,
+                    ["Parameters"] = new JObject()
+                    {
+                        [parameterName] = JToken.FromObject(parameterValue)
+                    }
+                };
+            }
 
             var messageJson = JsonConvert.SerializeObject(C2DMessage);
             var messageArray = Encoding.UTF8.GetBytes(messageJson);

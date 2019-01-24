@@ -5,7 +5,6 @@ import { IotService } from '../services/iot.service';
   selector: 'app-send-c2-d',
   templateUrl: './send-c2-d.component.html',
   styleUrls: ['./send-c2-d.component.css'],
-  providers: [ IotService ]
 })
 export class SendC2DComponent implements OnInit {
   message="";

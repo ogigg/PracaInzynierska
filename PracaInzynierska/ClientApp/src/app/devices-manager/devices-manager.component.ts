@@ -13,6 +13,7 @@ export class DevicesManagerComponent implements OnInit {
   connectionString;
   AddDeviceLayout=false;
   secondaryKey;
+  deviceId:any;
   constructor(private iotService: IotService) {
     iotService.getDevicesNames().subscribe(response=>{this.devices=response;})
    }
@@ -23,7 +24,7 @@ export class DevicesManagerComponent implements OnInit {
   onSelectChange(){
     console.log(this.currentDevice);
     if(this.currentDevice!=0){
-    this.iotService.getDeviceConnectionString(this.currentDevice).subscribe(response=>{
+    this.iotService.getDeviceConnectionString(this.currentDevice).subscribe((response:any)=>{
       this.primaryKey=response.primaryKey;
       this.secondaryKey=response.secondaryKey;
       this.connectionString="HostName=PracaInzynierkska.azure-devices.net;DeviceId="+this.currentDevice+";SharedAccessKey="+this.primaryKey;
@@ -35,8 +36,9 @@ export class DevicesManagerComponent implements OnInit {
   }
   onAddDevice(){
     this.AddDeviceLayout=false;
-    if(deviceId.value){
-      this.iotService.CreateNewDevice(deviceId.value).subscribe(res=>console.log(res))
+    console.log(this.deviceId)
+    if(this.deviceId){
+      this.iotService.CreateNewDevice(this.deviceId).subscribe(res=>console.log(res))
     }
 
   }

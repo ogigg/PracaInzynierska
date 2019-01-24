@@ -19,7 +19,8 @@
 
 <div *ngIf="AddDeviceLayout">
   <label for="deviceId">Nazwa urządzenia:</label>
-  <input type="text" id="deviceId" class="form-control" #deviceId>
+  <!-- <input type="text" id="deviceId" class="form-control" #deviceId> -->
+  <input type="text" id="deviceId" class="form-control" [(ngModel)]="deviceId">
   <button class="btn btn-primary" (click)="onAddDevice()" >Utwórz!</button>
 
 
